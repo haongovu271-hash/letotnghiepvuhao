@@ -386,6 +386,7 @@
   var FORM_BASE_URL = "https://docs.google.com/forms/d/e/1FAIpQLScL-uLcB4QhiyIyN3H_6eoLfGdABtGjqhaSw8bGzdhtlK78LQ/viewform";
   var ENTRY_NAME = "entry.1847979371";
   var ENTRY_PAINTING = "entry.439754522";
+  var ENTRY_ATTENDING = "entry.1316618384";
 
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -426,7 +427,7 @@
     }, 3000);
   }
 
-  // RSVP buttons — just react inline, no redirect
+  // RSVP buttons — react inline, then open the form pre-filled with the answer
   var fb = document.getElementById('rsvpFeedback');
   document.querySelectorAll('#rsvp .btn').forEach(function(btn){
     btn.addEventListener('click', function(){
@@ -435,6 +436,9 @@
         ? 'Oke luôn! Nhớ chốt đơn qua chụp hình với mình đó nha!'
         : 'Huhuhuhuhu 😭';
       fb.classList.add('show');
+      var answer = isYes ? 'Có' : 'Không';
+      var url = FORM_BASE_URL + '?usp=pp_url&' + ENTRY_ATTENDING + '=' + encodeURIComponent(answer);
+      window.open(url, '_blank');
     });
   });
 
