@@ -180,6 +180,9 @@
     padding:.5rem 1.3rem;
   }
   .rsvp-actions{display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;}
+  .rsvp-actions .btn.choice-selected{outline:2px solid var(--white);outline-offset:2px;}
+  #rsvp .name-field{margin-top:1.6rem;display:flex;justify-content:center;}
+  #rsvp .name-input{margin-bottom:.8rem;}
   .btn{
     font-family:var(--font);
     font-weight:700;
@@ -427,22 +430,23 @@
     }, 3000);
   }
 
-  // RSVP buttons — react inline, then open the form pre-filled with the answer
+  // RSVP: pick a choice (no form yet)
   var fb = document.getElementById('rsvpFeedback');
-  document.querySelectorAll('#rsvp .btn').forEach(function(btn){
+  var selectedAttending = null;
+  document.querySelectorAll('#rsvp .rsvp-actions .btn').forEach(function(btn){
     btn.addEventListener('click', function(){
+      document.querySelectorAll('#rsvp .rsvp-actions .btn').forEach(function(b){ b.classList.remove('choice-selected'); });
+      btn.classList.add('choice-selected');
       var isYes = btn.dataset.yes === 'true';
+      selectedAttending = isYes;
       fb.textContent = isYes
         ? 'Oke luôn! Nhớ chốt đơn qua chụp hình với mình đó nha!'
         : 'Huhuhuhuhu 😭';
       fb.classList.add('show');
-      var answer = isYes ? 'Có' : 'Không';
-      var url = FORM_BASE_URL + '?usp=pp_url&' + ENTRY_ATTENDING + '=' + encodeURIComponent(answer);
-      window.open(url, '_blank');
     });
   });
 
-  // painting selection
+  // painting selection (no form yet)
   var selectedPainting = null;
   document.querySelectorAll('.painting-card').forEach(function(card){
     card.addEventListener('click', function(){
@@ -452,10 +456,15 @@
     });
   });
 
-  // painting submit: require a pick + a name before sending
+  // final submit: require attendance choice + painting choice + name, then open the form with all 3 pre-filled
   var paintingFb = document.getElementById('paintingFeedback');
   document.getElementById('paintingCta').addEventListener('click', function(){
     var name = document.getElementById('guestName').value.trim();
+    if(selectedAttending === null){
+      paintingFb.textContent = 'Chọn "Sẽ đến dự" hoặc "Đi không được rùi" ở trên trước đã nha!';
+      paintingFb.classList.add('show');
+      return;
+    }
     if(!selectedPainting){
       paintingFb.textContent = 'Chọn 1 bức tranh trước đã nha!';
       paintingFb.classList.add('show');
@@ -467,12 +476,14 @@
       document.getElementById('guestName').focus();
       return;
     }
+    var attendAnswer = selectedAttending ? 'Có' : 'Không';
     paintingFb.textContent = 'Cảm ơn ' + name + '! Đã ghi nhận Tranh ' + selectedPainting + ', đợi quà bí mật nha! Đang mở form (đã điền sẵn, chỉ cần bấm Submit)...';
     paintingFb.classList.add('show');
     var prefillUrl = FORM_BASE_URL
       + '?usp=pp_url'
       + '&' + ENTRY_NAME + '=' + encodeURIComponent(name)
-      + '&' + ENTRY_PAINTING + '=' + encodeURIComponent(selectedPainting);
+      + '&' + ENTRY_PAINTING + '=' + encodeURIComponent(selectedPainting)
+      + '&' + ENTRY_ATTENDING + '=' + encodeURIComponent(attendAnswer);
     window.open(prefillUrl, '_blank');
   });
 </script>
